@@ -71,7 +71,7 @@ jobs:
             if (conclusion !== 'success') {
               core.setFailed(`Dispatched workflow failed with conclusion: ${conclusion}. See details here: ${runs.workflow_runs[0].html_url}`);
             } else {
-              console.log('Dispatched workflow completed successfully.');
+              console.log(`Dispatched workflow completed successfully. See details here: ${runs.workflow_runs[0].html_url}`);
             }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
