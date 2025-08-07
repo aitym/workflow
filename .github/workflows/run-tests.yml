@@ -1,0 +1,77 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  run-tests:
+    if: ! github.event.repository.is_template
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Test Workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const workflow_id = 'tests.yml';
+            const ref = context.payload.pull_request.head.ref;
+
+            console.log(`Dispatching workflow: ${workflow_id} on ref: ${ref}`);
+            await github.rest.actions.createWorkflowDispatch({
+              owner,
+              repo,
+              workflow_id,
+              ref,
+            });
+
+            await new Promise(r => setTimeout(r, 5000));
+
+            console.log('Finding the dispatched workflow run...');
+            const { data: runs } = await github.rest.actions.listWorkflowRuns({
+              owner,
+              repo,
+              workflow_id,
+              branch: ref,
+              event: 'workflow_dispatch',
+              per_page: 1,
+            });
+
+            if (runs.workflow_runs.length === 0) {
+              core.setFailed('Could not find the dispatched workflow run.');
+              return;
+            }
+
+            const run_id = runs.workflow_runs[0].id;
+            console.log(`Found run_id: ${run_id}`);
+
+            console.log('Waiting for workflow run to complete...');
+            let status = '';
+            let conclusion = '';
+            while (status !== 'completed') {
+              await new Promise(r => setTimeout(r, 15000));
+              const { data: run } = await github.rest.actions.getWorkflowRun({
+                owner,
+                repo,
+                run_id,
+              });
+              status = run.status;
+              conclusion = run.conclusion;
+              console.log(`Current status: ${status}`);
+            }
+
+            console.log(`Workflow completed with conclusion: ${conclusion}`);
+
+            if (conclusion !== 'success') {
+              core.setFailed(`Dispatched workflow failed with conclusion: ${conclusion}. See details here: ${runs.workflow_runs[0].html_url}`);
+            } else {
+              console.log('Dispatched workflow completed successfully.');
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
