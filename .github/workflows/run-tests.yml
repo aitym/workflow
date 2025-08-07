@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   run-tests:
-    if: ! github.event.repository.is_template
+    if: context.repo.repo != 'template'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Test Workflow
