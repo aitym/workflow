@@ -1,0 +1,107 @@
+name: Central CI Router
+
+on:
+  pull_request_target:
+
+jobs:
+  route-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout workflow repository
+        uses: actions/checkout@v4
+        with:
+          repository: aitym/workflow
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout target repository code
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: target-repo
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract repository name
+        id: repo-name
+        run: |
+          REPO_NAME="${{ github.event.pull_request.head.repo.name }}"
+          echo "repo_name=${REPO_NAME}" >> $GITHUB_OUTPUT
+          echo "Repository name: ${REPO_NAME}"
+      - name: Check if workflow file exists
+        id: check-workflow
+        run: |
+          WORKFLOW_FILE=".github/workflows/repo/${{ steps.repo-name.outputs.repo_name }}.yml"
+          echo "Checking for workflow file: ${WORKFLOW_FILE}"
+          if [ -f "$WORKFLOW_FILE" ]; then
+            echo "workflow_exists=true" >> $GITHUB_OUTPUT
+            echo "workflow_path=$WORKFLOW_FILE" >> $GITHUB_OUTPUT
+            echo "Found workflow file: ${WORKFLOW_FILE}"
+          else
+            echo "workflow_exists=false" >> $GITHUB_OUTPUT
+            echo "Workflow file not found: ${WORKFLOW_FILE}"
+            ls -la .github/workflows/repo/ || echo "repo directory does not exist"
+          fi
+      - name: Parse and execute workflow
+        if: steps.check-workflow.outputs.workflow_exists == 'true'
+        run: |
+          WORKFLOW_FILE="${{ steps.check-workflow.outputs.workflow_path }}"
+          echo "Executing workflow from: ${WORKFLOW_FILE}"
+          cd target-repo
+          python3 << 'EOF'
+          import yaml
+          import os
+          import subprocess
+          import sys
+          
+          workflow_file = "../${{ steps.check-workflow.outputs.workflow_path }}"
+          
+          try:
+              with open(workflow_file, 'r') as f:
+                  workflow = yaml.safe_load(f)
+          
+              print(f"Loaded workflow: {workflow.get('name', 'Unknown')}")
+          
+              for job_name, job_config in workflow.get('jobs', {}).items():
+                  print(f"\n=== Executing job: {job_name} ===")
+          
+                  for step in job_config.get('steps', []):
+                      step_name = step.get('name', 'Unnamed step')
+                      print(f"\n--- Step: {step_name} ---")
+          
+                      if 'run' in step:
+                          command = step['run']
+                          print(f"Running: {command}")
+          
+                          try:
+                              result = subprocess.run(
+                                  command, 
+                                  shell=True, 
+                                  check=True, 
+                                  capture_output=True, 
+                                  text=True
+                              )
+                              print(f"Output: {result.stdout}")
+                              if result.stderr:
+                                  print(f"Error: {result.stderr}")
+                          except subprocess.CalledProcessError as e:
+                              print(f"Command failed with exit code {e.returncode}")
+                              print(f"Error: {e.stderr}")
+                              sys.exit(1)
+          
+                      elif 'uses' in step:
+                          action = step['uses']
+                          print(f"Would execute action: {action}")
+          
+          except Exception as e:
+              print(f"Error processing workflow: {e}")
+              sys.exit(1)
+          
+          print("\n=== Workflow execution completed ===")
+          EOF
+      - name: Workflow not found
+        if: steps.check-workflow.outputs.workflow_exists == 'false'
+        run: |
+          echo "::error::No workflow found for repository ${{ steps.repo-name.outputs.repo_name }}"
+          echo "Expected file: .github/workflows/repo/${{ steps.repo-name.outputs.repo_name }}.yml"
+          echo "Available files:"
+          find .github/workflows/ -name "*.yml" -o -name "*.yaml" | head -10
+          exit 1
