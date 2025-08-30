@@ -1,0 +1,11 @@
+name: Repository-Specific CI Pipeline
+
+on:
+  workflow_call:
+
+jobs:
+  do-nothing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Do nothing
+        run: exit 0
