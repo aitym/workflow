@@ -7,5 +7,5 @@ jobs:
   do-nothing:
     runs-on: ubuntu-latest
     steps:
-      - name: Do nothing
-        run: exit 0
+      - name: Test CI
+        run: echo "Test CI"
