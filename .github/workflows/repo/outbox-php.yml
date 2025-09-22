@@ -24,6 +24,7 @@ jobs:
       - name: Run tests in container
         run: |
           docker run --rm \
+            -u "$(id -u):$(id -g)" \
             -v $PWD:/app \
             -w /app \
             outbox-php:latest \
