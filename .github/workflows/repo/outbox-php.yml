@@ -20,4 +20,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Docker image
-        run: docker build -t ci-image:local -f .docker/app/Dockerfile .
+        run: docker build -t outbox-php:latest -f .docker/app/Dockerfile .
+      - name: Run tests in container
+        run: |
+          docker run --rm \
+            -v $PWD:/app \
+            -w /app \
+            outbox-php:latest \
+            sh -c "composer install --no-interaction --no-progress --prefer-dist && ./vendor/bin/pest --coverage"
