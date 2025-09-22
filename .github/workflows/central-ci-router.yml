@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aitym/workflow
-          ref: main
+          ref: ${{ vars.WORKFLOW_REF }}
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout target repository code
         uses: actions/checkout@v4
