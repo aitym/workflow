@@ -27,4 +27,4 @@ jobs:
             -v $PWD:/app \
             -w /app \
             outbox-php:latest \
-            sh -c "composer install --no-interaction --no-progress --prefer-dist && /app/vendor/bin/pest --coverage"
+            sh -c "pwd && composer install --no-interaction --no-progress --prefer-dist && /app/vendor/bin/pest --coverage"
