@@ -27,4 +27,4 @@ jobs:
             -u "$(id -u):$(id -g)" \
             -v "$PWD":/app \
             outbox-php:latest \
-            sh -lc 'id && whoami && pwd && ls -lah && php -v && php -m && composer install -a --no-dev --no-cache --no-interaction --ignore-platform-reqs'
+            sh -lc 'id && pwd && ls -lah && php -v && php -m && composer install -a --no-dev --no-cache --no-interaction --ignore-platform-reqs'
