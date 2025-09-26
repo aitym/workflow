@@ -24,7 +24,7 @@ jobs:
       - name: Run tests in container
         run: |
           docker run --rm \
-            -v "$PWD":/app
+            -v "$PWD":/app \
             outbox-php:latest \
             sh -lc 'id && ls -ld /app && touch /app/.write-test && ls -l /app/.write-test'
 #          docker run --rm \
