@@ -20,4 +20,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Docker image
-        run: docker build -t ci-image:local -f .docker/app/Dockerfile .
+        run: docker build -t outbox-php:latest -f .docker/app/Dockerfile .
+      - name: Composer install
+        run: |
+          docker run --rm \
+            -u "$(id -u):$(id -g)" \
+            -v "$PWD":/app \
+            outbox-php:latest \
+            sh -lc 'set -o pipefail; composer install --no-interaction --no-progress --no-cache --no-ansi --prefer-dist --optimize-autoloader 2>&1'
+      - name: Run tests
+        run: |
+          docker run --rm \
+            -u "$(id -u):$(id -g)" \
+            -v "$PWD":/app \
+            outbox-php:latest \
+            sh -lc './vendor/bin/pest'
