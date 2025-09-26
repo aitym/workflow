@@ -27,4 +27,4 @@ jobs:
             -u "$(id -u):$(id -g)" \
             -v "$PWD":/app \
             outbox-php:latest \
-            sh -lc 'composer install --no-interaction --prefer-dist --optimize-autoloader && ./vendor/bin/pest'
+            sh -lc 'composer install --no-interaction --no-cache --prefer-dist --optimize-autoloader && ./vendor/bin/pest'
