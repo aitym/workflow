@@ -25,6 +25,5 @@ jobs:
         run: |
           docker run --rm \
             -v "$PWD":/app \
-            -w /app \
             outbox-php:latest \
-            sh -lc 'id && php -v && php -m && composer install --no-interaction --no-progress --prefer-dist -vvv'
+            sh -lc 'id && pwd && ls -lah && php -v && php -m'
