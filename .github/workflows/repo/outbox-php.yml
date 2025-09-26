@@ -27,4 +27,4 @@ jobs:
             -v "$PWD":/app \
             -w /app \
             outbox-php:latest \
-            sh -lc 'id'
+            sh -lc 'id && php -v && php -m && (grep -i xdebug || true)'
