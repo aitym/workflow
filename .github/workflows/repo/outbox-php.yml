@@ -21,10 +21,17 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Docker image
         run: docker build -t outbox-php:latest -f .docker/app/Dockerfile .
+      - name: Install composer packages
+        run: |
+          docker run --rm \
+            -u "$(id -u):$(id -g)" \
+            -v "$PWD":/app \
+            outbox-php:latest \
+            sh -lc 'composer install --no-interaction --no-progress --no-cache --no-ansi --prefer-dist --optimize-autoloader'
       - name: Run tests in container
         run: |
           docker run --rm \
             -u "$(id -u):$(id -g)" \
             -v "$PWD":/app \
             outbox-php:latest \
-            sh -lc 'composer install --no-interaction --no-progress --no-cache --no-ansi --prefer-dist --optimize-autoloader && ./vendor/bin/pest'
+            sh -lc './vendor/bin/pest'
