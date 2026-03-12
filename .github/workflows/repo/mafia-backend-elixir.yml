@@ -3,35 +3,10 @@ name: Repository-Specific CI Pipeline
 on:
   workflow_call:
 
-env:
-  MIX_ENV: test
-
 jobs:
   test:
     name: mix test (${{ matrix.app }})
     runs-on: ubuntu-latest
-    container:
-      image: elixir:1.19.5-otp-28-alpine
-
-    strategy:
-      matrix:
-        app: [mafia, mafia_web]
-      fail-fast: false
-
-    services:
-      mysql:
-        image: mysql:9.6.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: mafia_test
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     steps:
       - uses: actions/checkout@v4
 
