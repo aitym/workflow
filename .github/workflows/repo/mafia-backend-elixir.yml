@@ -36,10 +36,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Elixir
-        uses: erlef/setup-beam@v1
-        with:
-          elixir-version: ${{ env.ELIXIR_VERSION }}
-          otp-version: ${{ env.OTP_VERSION }}
+        run: |
+          wget -q https://builds.hex.pm/builds/elixir/v${{ env.ELIXIR_VERSION }}-otp-${{ env.OTP_VERSION }}.zip -O elixir.zip
+          unzip -q elixir.zip -d /usr/local/elixir
+          echo "/usr/local/elixir/bin" >> $PATH
+          export PATH="/usr/local/elixir/bin:$PATH"
+          apt-get install -y erlang
+          mix local.hex --force
+          mix local.rebar --force
 
       - name: Restore deps cache
         uses: actions/cache@v4
