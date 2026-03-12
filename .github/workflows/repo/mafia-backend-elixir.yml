@@ -10,6 +10,8 @@ jobs:
   test:
     name: mix test (${{ matrix.app }})
     runs-on: ubuntu-latest
+    container:
+      image: elixir:1.19.5-otp-28-alpine
 
     strategy:
       matrix:
