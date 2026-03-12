@@ -1,3 +1,8 @@
+name: Repository-Specific CI Pipeline
+
+on:
+  workflow_call:
+
 env:
   MIX_ENV: test
   ELIXIR_VERSION: "1.17"
