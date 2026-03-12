@@ -3,11 +3,6 @@ name: Repository-Specific CI Pipeline
 on:
   workflow_call:
 
-env:
-  MIX_ENV: test
-  ELIXIR_VERSION: "1.19.5"
-  OTP_VERSION: "28"
-
 jobs:
   test:
     name: mix test (${{ matrix.app }})
@@ -37,9 +32,10 @@ jobs:
 
       - name: Set up Elixir
         run: |
-          wget -q https://builds.hex.pm/builds/elixir/v${{ env.ELIXIR_VERSION }}-otp-${{ env.OTP_VERSION }}.zip -O elixir.zip
+          export OTP_VERSION="28.1"
+          export ELIXIR_VERSION="1.19.5"
+          wget -q https://builds.hex.pm/builds/elixir/v${ELIXIR_VERSION}-otp-${OTP_VERSION}.zip -O elixir.zip
           unzip -q elixir.zip -d /usr/local/elixir
-          echo "/usr/local/elixir/bin" >> $PATH
           export PATH="/usr/local/elixir/bin:$PATH"
           apt-get install -y erlang
           mix local.hex --force
@@ -64,4 +60,4 @@ jobs:
         run: mix ecto.create && mix ecto.migrate
 
       - name: Run tests
-        run: mix test apps/${{ matrix.app }}
+        run: MIX_ENV=test mix test apps/${{ matrix.app }}
