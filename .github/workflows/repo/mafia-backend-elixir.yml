@@ -5,13 +5,13 @@ on:
 
 env:
   MIX_ENV: test
+  ELIXIR_VERSION: "1.19.5"
+  OTP_VERSION: "28"
 
 jobs:
   test:
     name: mix test (${{ matrix.app }})
     runs-on: ubuntu-latest
-    container:
-      image: elixir:1.19.5-otp-28-alpine
 
     strategy:
       matrix:
@@ -35,8 +35,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install system deps
-        run: apk add --no-cache build-base git
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ env.ELIXIR_VERSION }}
+          otp-version: ${{ env.OTP_VERSION }}
 
       - name: Restore deps cache
         uses: actions/cache@v4
