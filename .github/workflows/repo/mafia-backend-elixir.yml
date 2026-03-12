@@ -32,6 +32,7 @@ jobs:
 
       - name: Set up Elixir
         run: |
+          export DEBIAN_FRONTEND=noninteractive
           sudo apt-get install -y erlang
           OTP_SHORT=$(erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().' -noshell | tr -d '"')
           ELIXIR_VERSION="1.19.5"
