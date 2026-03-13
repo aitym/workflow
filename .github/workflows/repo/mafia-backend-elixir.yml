@@ -44,6 +44,9 @@ jobs:
           asdf global erlang 28.1
           asdf global elixir 1.19.5-otp-28
           export PATH="$ASDF_DIR/shims:$ASDF_DIR/bin:$PATH"
+          sudo ln -sf "$ASDF_DIR/shims/mix" /usr/local/bin/mix
+          sudo ln -sf "$ASDF_DIR/shims/elixir" /usr/local/bin/elixir
+          sudo ln -sf "$ASDF_DIR/shims/erl" /usr/local/bin/erl
           mix local.hex --force
           mix local.rebar --force
 
