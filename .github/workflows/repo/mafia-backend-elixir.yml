@@ -34,9 +34,7 @@ jobs:
         run: |
           export DEBIAN_FRONTEND=noninteractive
           sudo apt-get install -y erlang
-          OTP_SHORT=$(erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().' -noshell | tr -d '"')
-          ELIXIR_VERSION="1.19.5"
-          wget -q https://builds.hex.pm/builds/elixir/v${ELIXIR_VERSION}-otp-${OTP_SHORT}.zip -O elixir.zip
+          wget -q https://builds.hex.pm/builds/elixir/v1.19.5-otp-28.zip -O elixir.zip
           sudo unzip -q elixir.zip -d /usr/local/elixir
           export PATH="/usr/local/elixir/bin:$PATH"
           mix local.hex --force
