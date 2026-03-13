@@ -33,13 +33,16 @@ jobs:
       - name: Set up Elixir
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
-          sudo dpkg -i erlang-solutions_2.0_all.deb
-          sudo apt-get update -q
-          sudo apt-get install -y esl-erlang=1:28.1-1
-          wget -q https://builds.hex.pm/builds/elixir/v1.19.5-otp-28.zip -O elixir.zip
-          sudo unzip -q elixir.zip -d /usr/local/elixir
-          export PATH="/usr/local/elixir/bin:$PATH"
+          sudo apt-get install -y git curl libssl-dev automake autoconf libncurses5-dev build-essential
+          git clone --depth 1 https://github.com/asdf-vm/asdf.git ~/.asdf
+          . ~/.asdf/asdf.sh
+          asdf plugin add erlang
+          asdf plugin add elixir
+          asdf install erlang 28.1
+          asdf install elixir 1.19.5-otp-28
+          asdf global erlang 28.1
+          asdf global elixir 1.19.5-otp-28
+          export PATH="$HOME/.asdf/shims:$HOME/.asdf/bin:$PATH"
           mix local.hex --force
           mix local.rebar --force
 
