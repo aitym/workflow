@@ -33,7 +33,10 @@ jobs:
       - name: Set up Elixir
         run: |
           export DEBIAN_FRONTEND=noninteractive
-          sudo apt-get install -y erlang
+          wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
+          sudo dpkg -i erlang-solutions_2.0_all.deb
+          sudo apt-get update -q
+          sudo apt-get install -y esl-erlang=1:28.1-1
           wget -q https://builds.hex.pm/builds/elixir/v1.19.5-otp-28.zip -O elixir.zip
           sudo unzip -q elixir.zip -d /usr/local/elixir
           export PATH="/usr/local/elixir/bin:$PATH"
